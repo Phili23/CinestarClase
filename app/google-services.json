@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "835705716213",
+    "project_id": "cinestar-60e3d",
+    "storage_bucket": "cinestar-60e3d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:835705716213:android:5fc76db83b969e4c0bb4bc",
+        "android_client_info": {
+          "package_name": "com.example.g102"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "835705716213-518mvitaktkqttcqsmrf4ij5t63g945f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.g102",
+            "certificate_hash": "427bb2a37ca95e4f653237dcd5f6b9b00a7c3489"
+          }
+        },
+        {
+          "client_id": "835705716213-h47n8ovh7pc4v9geg9pts28pg3r8ib64.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ-F9bZuxF3YVGpM3BX-MqfjacXam-CmU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "835705716213-h47n8ovh7pc4v9geg9pts28pg3r8ib64.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
