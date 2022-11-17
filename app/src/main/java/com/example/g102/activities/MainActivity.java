@@ -1,4 +1,4 @@
-package com.example.g102;
+package com.example.g102.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,9 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.g102.R;
+import com.example.g102.models.User;
+import com.example.g102.providers.AuthProviders;
+import com.example.g102.providers.UsersProviders;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -24,6 +31,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.protobuf.Api;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,13 +41,12 @@ TextView mTextVierRegister;
     TextInputEditText mTextImputEditTextEmail;
 TextInputEditText mTextImputEditTextPassword;
     Button mButtonLogin;
-    FirebaseAuth mAuth;
-    Button mbtngoogle;
-    FirebaseFirestore mFirestore;
-
+   AuthProviders mAuthProviders;
+    SignInButton mbtngoogle;
+    UsersProviders mUsersproviders;
 
     private GoogleSignInClient mGoogleSignInClient;
-    private final int REQUEST_CODE_GOOGLE=1;
+    private final int REQUEST_CODE_GOOGLE=1;// este es el de los tokens
 
 
 
@@ -55,12 +62,13 @@ TextInputEditText mTextImputEditTextPassword;
         mButtonLogin=findViewById(R.id.btnlogin);
         mbtngoogle=findViewById(R.id.bntnLoginSignInGoogle);
 
-        mAuth=FirebaseAuth.getInstance();
+        mAuthProviders=new AuthProviders();
+        mUsersproviders=new UsersProviders();
 
         mbtngoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+            signInGoogle();
             }
         });
 
@@ -94,14 +102,28 @@ private void signInGoogle(){
     startActivityForResult(signIntent,REQUEST_CODE_GOOGLE);
 }
 
-    private void firebaseAuthWithGoogle(String idToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential)
+@Override
+public void  onActivityResult(int requesCode, int resulCode, Intent data){
+
+    super.onActivityResult(requesCode,resulCode,data);
+    if (requesCode==REQUEST_CODE_GOOGLE){
+        Task<GoogleSignInAccount> task=GoogleSignIn.getSignedInAccountFromIntent(data);
+        try {
+            GoogleSignInAccount acount=task.getResult(ApiException.class);
+            firebaseAuthWithGoogle(acount);
+        }catch(ApiException e){
+            Log.w("ERROR","Google sign in failed",e);
+        }
+    }
+}
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        mAuthProviders.googleLogin(account)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            String id=mAuth.getCurrentUser().getUid();
+                            String id=mAuthProviders.getUid();//
                             checkUserExist(id);
                             // Sign in success, update UI with the signed-in user's information
 
@@ -115,17 +137,22 @@ private void signInGoogle(){
     }
 
     private void checkUserExist(final String id) {
-    mFirestore.collection("Users").document(id).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+    mUsersproviders.getUser(id).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
         @Override
         public void onSuccess(DocumentSnapshot documentSnapshot) {
             if (documentSnapshot.exists()){
                 Intent intent=new Intent(MainActivity.this,HomeActivity.class);
                 startActivity(intent);//inicia la actividad
             }else{
-                String email=mAuth.getCurrentUser().getEmail();
-                Map<String,Object> map=new HashMap<>();
-                map.put("email",email);
-                mFirestore.collection("Users").document(id).set(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                String email=mAuthProviders.getEmail();
+                User user=new  User();
+               user.setEmail(email);
+               user.setId(id);
+
+                //Map<String,Object> map=new HashMap<>();
+               // map.put("email",email);
+                mUsersproviders.create(user).
+                addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()){
@@ -149,8 +176,7 @@ private void signInGoogle(){
     private void login() {
         String email = mTextImputEditTextEmail.getText().toString();
         String password = mTextImputEditTextPassword.getText().toString();
-
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        mAuthProviders.login(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {

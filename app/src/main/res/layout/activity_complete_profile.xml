@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".CompleteProfileActivity">
+    tools:context=".activities.CompleteProfileActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -101,7 +101,7 @@
             android:id="@+id/btnConfirmar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="REGISTRARSE"
+            android:text="Confirmar"
             android:layout_marginTop="70dp"
             android:layout_marginBottom="30dp"
             android:layout_marginRight="20dp"
