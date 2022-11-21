@@ -3,6 +3,7 @@ package com.example.g102.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,16 +26,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.protobuf.Api;
 
-import java.util.HashMap;
-import java.util.Map;
+import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity {
 TextView mTextVierRegister;
@@ -44,6 +39,7 @@ TextInputEditText mTextImputEditTextPassword;
    AuthProviders mAuthProviders;
     SignInButton mbtngoogle;
     UsersProviders mUsersproviders;
+    AlertDialog mDialog;
 
     private GoogleSignInClient mGoogleSignInClient;
     private final int REQUEST_CODE_GOOGLE=1;// este es el de los tokens
@@ -64,6 +60,12 @@ TextInputEditText mTextImputEditTextPassword;
 
         mAuthProviders=new AuthProviders();
         mUsersproviders=new UsersProviders();
+
+      mDialog=new  SpotsDialog.Builder()
+                .setContext(this)
+                .setMessage("Espere un momento...")
+                .setCancelable(false)
+                .build();
 
         mbtngoogle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,16 +120,19 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
 }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+    mDialog.show();
         mAuthProviders.googleLogin(account)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+
                             String id=mAuthProviders.getUid();//
                             checkUserExist(id);
                             // Sign in success, update UI with the signed-in user's information
 
                         } else {
+                            mDialog.dismiss();
                             // If sign in fails, display a message to the user.
                             Log.w("ERROR", "signInWithCredential:failure", task.getException());
 
@@ -137,9 +142,11 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
     }
 
     private void checkUserExist(final String id) {
+
     mUsersproviders.getUser(id).addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
         @Override
         public void onSuccess(DocumentSnapshot documentSnapshot) {
+            mDialog.dismiss();
             if (documentSnapshot.exists()){
                 Intent intent=new Intent(MainActivity.this,HomeActivity.class);
                 startActivity(intent);//inicia la actividad
@@ -155,6 +162,7 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
                 addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
+                        mDialog.dismiss();
                         if (task.isSuccessful()){
                             Intent intent=new Intent(MainActivity.this,HomeActivity.class);
                             startActivity(intent);
@@ -176,9 +184,11 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
     private void login() {
         String email = mTextImputEditTextEmail.getText().toString();
         String password = mTextImputEditTextPassword.getText().toString();
+        mDialog.show();
         mAuthProviders.login(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+                mDialog.dismiss();
                 if (task.isSuccessful()) {
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     startActivity(intent);
@@ -189,4 +199,7 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
         });
         Log.d("campo", "email" + email);
         Log.d("campo", "pasword" + password);
-    }}
+    }
+
+
+}

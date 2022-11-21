@@ -3,6 +3,8 @@ package com.example.g102.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,15 +18,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import dmax.dialog.SpotsDialog;
 
 public class RegsiterActivity extends AppCompatActivity {
 
@@ -38,6 +37,7 @@ Button mButtonRegister;
 //FirebaseFirestore mFirestore;
     AuthProviders mAutProvider;
     UsersProviders mUsersProvider;
+    AlertDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,12 @@ Button mButtonRegister;
         //mAut=FirebaseAuth.getInstance();
         //mFirestore=FirebaseFirestore.getInstance();
 
-        mAutProvider=new AuthProviders();
-        mUsersProvider=new UsersProviders();
 
+        mDialog=new SpotsDialog.Builder()
+                .setContext(this)
+                .setMessage("Espere un momento...")
+                .setCancelable(false)
+                .build();
 
         mAutProvider=new AuthProviders();
         mUsersProvider= new UsersProviders();
@@ -110,9 +113,11 @@ Button mButtonRegister;
     }
 
     private void createUser(String username,String email, String password) {
+        mDialog.show();
        mAutProvider.register(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
                 if (task.isSuccessful()){
                     String id=mAutProvider.getUid();
                     //Map<String,Object>  map =new HashMap<>();
@@ -128,8 +133,12 @@ Button mButtonRegister;
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
+                            mDialog.dismiss();
                             if (task.isSuccessful()){
                                 Toast.makeText(RegsiterActivity.this, "El usuario se almaceno correctamente", Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent(RegsiterActivity.this,HomeActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);//metodo de limpiar las banderas
+                                startActivity(intent);
                             }else{
                                 Toast.makeText(RegsiterActivity.this, "EL usuario no fue almacenado", Toast.LENGTH_SHORT).show();
                             }
@@ -137,6 +146,7 @@ Button mButtonRegister;
                     });
                     Toast.makeText(RegsiterActivity.this, "El usuario se registro correctamente", Toast.LENGTH_SHORT).show();
                 }else{
+                    mDialog.dismiss();
                     Toast.makeText(RegsiterActivity.this, "No se pudo hacer el registro", Toast.LENGTH_SHORT).show();
                 }
 
