@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">G102</string>
     <string name="Hola">Dialog</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hola_soy_home">hola soy Home</string>
 </resources>

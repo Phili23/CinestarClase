@@ -137,8 +137,7 @@ Button mButtonRegister;
                             if (task.isSuccessful()){
                                 Toast.makeText(RegsiterActivity.this, "El usuario se almaceno correctamente", Toast.LENGTH_SHORT).show();
                                 Intent intent=new Intent(RegsiterActivity.this,HomeActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);//metodo de limpiar las banderas
-                                startActivity(intent);
+
                             }else{
                                 Toast.makeText(RegsiterActivity.this, "EL usuario no fue almacenado", Toast.LENGTH_SHORT).show();
                             }

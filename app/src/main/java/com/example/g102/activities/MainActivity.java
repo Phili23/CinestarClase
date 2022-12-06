@@ -32,6 +32,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity {
+
+    //CREACIÓN DE OBJETOS DEL REGISTER =======================================================================
 TextView mTextVierRegister;
     TextInputEditText mTextImputEditTextEmail;
 TextInputEditText mTextImputEditTextPassword;
@@ -51,7 +53,7 @@ TextInputEditText mTextImputEditTextPassword;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+    //SEARCH ID===========================================================================================
         mTextVierRegister=findViewById(R.id.TextViewRegister);
         mTextImputEditTextEmail=findViewById(R.id.textInputEditTextEmail);
         mTextImputEditTextPassword=findViewById(R.id.textInputEditTextPassword);
@@ -74,6 +76,7 @@ TextInputEditText mTextImputEditTextPassword;
             }
         });
 
+    //CONFIGURE GOOGLE SIGN IN============================================================================
     GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
@@ -81,6 +84,8 @@ TextInputEditText mTextImputEditTextPassword;
 
     mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
+
+    //SING IN GOOGLE BUTTON================================================================================
         mButtonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,7 +94,7 @@ TextInputEditText mTextImputEditTextPassword;
         });
 
 
-
+    //TxtRegister INSTANCE================================================================================
         mTextVierRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,12 +103,13 @@ TextInputEditText mTextImputEditTextPassword;
             }
         });
     }
-
+    // [START signin]
 private void signInGoogle(){
     Intent signIntent=mGoogleSignInClient.getSignInIntent();
     startActivityForResult(signIntent,REQUEST_CODE_GOOGLE);
 }
 
+    // [START onactivityresult]
 @Override
 public void  onActivityResult(int requesCode, int resulCode, Intent data){
 
@@ -176,10 +182,8 @@ public void  onActivityResult(int requesCode, int resulCode, Intent data){
 
         }
     });
-
-
     }
-
+    //LOGIN METHOD ===============================================================================================================
 
     private void login() {
         String email = mTextImputEditTextEmail.getText().toString();
